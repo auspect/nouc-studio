@@ -1,0 +1,134 @@
+[project]
+name = "nouc-studio"
+dynamic = ["version"]
+description = "Nouc Studio: Self-evolving multi-agent system using Marimo & Monty sandboxes to build auditable, explainable, multi-view Marimo Studio applications from multimodal inputs."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [
+    { name = "Nouc Studio Contributors" }
+]
+dependencies = [
+    "marimo>=0.20.0",
+    "marimo-studio>=0.3.0",
+    "polars>=1.20.0",
+    "fastexcel>=0.12.0",
+    "duckdb>=1.2.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.7.0",
+    "pydantic-ai-slim[google]>=2.0.0",
+    "google-genai>=1.0.0",
+    "pydantic-monty>=0.0.3",
+    "rustworkx>=0.16.0",
+    "pointblank>=0.10.0",
+    "wigglystuff>=0.1.10",
+    "httpx>=0.28.0",
+    "rich>=13.9.0",
+    "typer>=0.15.0",
+    "tomlkit>=0.13.0",
+    "pypdf>=5.1.0",
+    "python-docx>=1.1.2",
+    "python-pptx>=1.0.2",
+    "pillow>=11.0.0",
+    "pyarrow>=26.0.0",
+]
+
+[project.optional-dependencies]
+verify = [
+    "ruff>=0.9.0",
+    "ty>=0.0.1a1",
+    "pytest>=8.3.0",
+]
+eval = [
+    "deepeval>=2.0.0",
+]
+extraction = [
+    "kreuzberg>=3.0.0",
+]
+
+[project.scripts]
+nouc = "nouc_studio.cli:app"
+nouc-studio = "nouc_studio.cli:app"
+insights = "nouc_studio.cli:app"
+
+[project.urls]
+Repository = "https://github.com/auspect/nouc-studio"
+Issues = "https://github.com/auspect/nouc-studio/issues"
+
+[build-system]
+requires = ["hatchling==1.27.0", "hatch-vcs==0.5.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+tag-pattern = '^v(?P<version>(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:(?:a|b|rc)(?:0|[1-9]\d*))?)$'
+
+[tool.hatch.version.raw-options]
+dist_name = "nouc-studio"
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
+git_describe_command = "git describe --dirty --tags --long --match v[0-9]*"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nouc_studio"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"AGENTS.md" = "nouc_studio/_bootstrap/AGENTS.md"
+".github/copilot-instructions.md" = "nouc_studio/_bootstrap/.github/copilot-instructions.md"
+".github/agents/nouc-studio.agent.md" = "nouc_studio/_bootstrap/.github/agents/nouc-studio.agent.md"
+"skills/marimo-pair-sandbox/SKILL.md" = "nouc_studio/_bootstrap/skills/marimo-pair-sandbox/SKILL.md"
+"skills/deepwiki-live-grounding/SKILL.md" = "nouc_studio/_bootstrap/skills/deepwiki-live-grounding/SKILL.md"
+"skills/adaptive-failure-memory/SKILL.md" = "nouc_studio/_bootstrap/skills/adaptive-failure-memory/SKILL.md"
+"skills/epistemic-lineage-studio/SKILL.md" = "nouc_studio/_bootstrap/skills/epistemic-lineage-studio/SKILL.md"
+"skills/studio-experience-design/SKILL.md" = "nouc_studio/_bootstrap/skills/studio-experience-design/SKILL.md"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/AGENTS.md",
+    "/.github/copilot-instructions.md",
+    "/.github/agents/nouc-studio.agent.md",
+    "/skills/marimo-pair-sandbox/SKILL.md",
+    "/skills/deepwiki-live-grounding/SKILL.md",
+    "/skills/adaptive-failure-memory/SKILL.md",
+    "/skills/epistemic-lineage-studio/SKILL.md",
+    "/skills/studio-experience-design/SKILL.md",
+    "/src/nouc_studio",
+    "/tests",
+    "/scripts",
+    "/pyproject.toml",
+    "/uv.lock",
+    "/README.md",
+    "/CONTRIBUTING.md",
+    "/LICENSE",
+    "/NOTICE",
+    "/docs/publishing.md",
+    "/docs/new-project.md",
+    "/examples/demo_3_ai_infra_finops/frontier_llm_routing_2026.xlsx",
+    "/examples/demo_2_clinical_biotech/phase2_patient_cohorts.xlsx",
+    "/examples/sample_bundle/pricing_model.py",
+    "/examples/sample_bundle/methodology_notes.md",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.25.0",
+    "ruff>=0.9.0",
+    "ty>=0.0.1a1",
+    "twine>=6.1,<7",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501", "B018"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+pythonpath = ["src"]

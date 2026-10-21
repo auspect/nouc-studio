@@ -1,0 +1,7 @@
+segment,region,revenue,operating_cost,latency_ms,confidence_weight
+Enterprise,EMEA,148500.0,51200.0,42.5,0.97
+Enterprise,NA,215000.0,74000.0,38.1,0.98
+MidMarket,EMEA,92400.0,34500.0,55.0,0.93
+MidMarket,NA,118000.0,41900.0,49.2,0.94
+SMB,EMEA,54200.0,23100.0,68.4,0.89
+SMB,APAC,63800.0,27400.0,74.0,0.88

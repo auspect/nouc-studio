@@ -1,0 +1,112 @@
+name: Build and publish Python package
+
+on:
+  push:
+    tags: ["v[0-9]*"]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Build artifacts only, or publish an existing release tag
+        type: choice
+        options: [build, testpypi, pypi]
+        default: build
+        required: true
+      tag:
+        description: Existing release tag; optional for build or TestPyPI snapshot of main
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.event_name == 'push' && 'pypi' || inputs.target }}-${{ github.event_name == 'push' && github.ref_name || inputs.tag || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.event_name != 'push' || github.event.deleted == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event_name == 'push' && github.event.repository.default_branch || github.ref }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.12.22"
+          enable-cache: true
+          python-version: "3.12"
+          cache-suffix: publish-py3.12
+      - name: Validate the source before executing release code
+        id: source
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+          PUBLISH_TARGET: ${{ github.event_name == 'push' && 'pypi' || inputs.target }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: python scripts/release.py select
+      - name: Freeze the selected commit
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.source_sha }}
+        run: |
+          git checkout --detach "$SOURCE_SHA"
+          echo "SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)" >> "$GITHUB_ENV"
+      - name: Install the locked development environment
+        run: uv sync --locked
+      - name: Verify source
+        run: |
+          uv run --no-sync ruff check src tests scripts
+          uv run --no-sync ty check src tests scripts
+          uv run --no-sync pytest -q
+      - name: Derive an index-compatible TestPyPI snapshot from Git metadata
+        if: github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi' && inputs.tag == ''
+        id: test-version
+        run: |
+          uv run --no-sync python scripts/release.py test-version
+      - name: Build sdist, then build wheel from sdist
+        env:
+          SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOUC_STUDIO: ${{ steps.test-version.outputs.test_version }}
+        run: uv build --no-sources --out-dir dist/package
+      - name: Check distribution metadata and contents
+        id: distributions
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+          EXPECTED_TEST_VERSION: ${{ steps.test-version.outputs.test_version }}
+        run: |
+          uv run --no-sync python scripts/release.py inspect dist/package
+          uv run --no-sync twine check --strict dist/package/*
+      - name: Test installed wheel outside the source tree
+        run: uv run --no-sync python scripts/check_bootstrap_install.py dist/package
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: python-distributions
+          path: |
+            dist/package/*.whl
+            dist/package/*.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    if: github.event_name == 'push' || inputs.target != 'build'
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: ${{ github.event_name == 'push' && 'pypi' || inputs.target }}
+      url: ${{ (github.event_name == 'push' || inputs.target == 'pypi') && 'https://pypi.org/p/nouc-studio' || 'https://test.pypi.org/p/nouc-studio' }}
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: python-distributions
+          path: dist/package
+      - name: Publish the exact verified distributions with OIDC
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
+        with:
+          packages-dir: dist/package
+          repository-url: ${{ (github.event_name == 'push' || inputs.target == 'pypi') && 'https://upload.pypi.org/legacy/' || 'https://test.pypi.org/legacy/' }}
+          attestations: true
+          skip-existing: false

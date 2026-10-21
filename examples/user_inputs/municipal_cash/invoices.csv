@@ -1,0 +1,10 @@
+invoice_id,account_id,account_name,service,issued_date,due_date,amount_eur,status
+INV-001,ACC-01,Familles Est,Childcare,2026-09-01,2026-09-30,1200.00,issued
+INV-002,ACC-01,Familles Est,School meals,2026-09-15,2026-10-10,800.00,issued
+INV-003,ACC-02,Sports Association,Facility rental,2026-10-01,2026-10-20,1500.00,issued
+INV-004,ACC-03,Community Theatre,Facility rental,2026-09-01,2026-09-15,600.00,issued
+INV-005,ACC-04,Local Market Traders,Market fees,2026-08-01,2026-08-31,350.00,issued
+INV-006,ACC-05,Cancelled Workshop,Workshop,2026-09-01,2026-09-20,900.00,cancelled
+INV-007,ACC-06,Library Friends,Facility rental,2026-09-01,2026-10-01,950.00,issued
+INV-008,ACC-07,Municipal Residence Renovation Partnership With An Intentionally Long Name,Public works,2026-08-01,2026-09-01,2000.00,issued
+INV-009,ACC-08,West District Families,Childcare,2026-10-01,2026-10-15,650.00,issued

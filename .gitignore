@@ -1,0 +1,38 @@
+# Virtual environments & package managers
+.venv/
+venv/
+.pixi/
+.cache/
+.uv-cache/
+
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Build & distribution outputs
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Marimo runtime & studio staging artifacts (in root workspace)
+__marimo__/
+
+# Local failure memory may contain input data, paths, prompts and diagnostics.
+# Share reviewed, anonymized prevention rules in documentation instead.
+.insights/memory/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# OS & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

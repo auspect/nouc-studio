@@ -1,0 +1,18 @@
+[project]
+name = "nouc-studio"
+description = "Nouc Studio: Self-evolving multi-agent system using Marimo & Monty sandboxes to build auditable, explainable, multi-view Marimo Studio applications."
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64", "osx-arm64", "osx-64"]
+
+[tasks]
+sync = "uv sync"
+check-lint = "uv run ruff check src tests"
+check-types = "uv run ty check src"
+test = "uv run pytest -q"
+verify-all = { depends-on = ["check-lint", "check-types", "test"] }
+workbench = "uv run marimo edit src/nouc_studio/studio/workbench.py --sandbox --watch --no-token"
+
+[dependencies]
+python = ">=3.12,<3.14"
+uv = ">=0.6.0"
+ruff = ">=0.9.0"

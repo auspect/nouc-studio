@@ -1,0 +1,69 @@
+name: Nouc Studio CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Lint, Typecheck & Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.12.22"
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+          cache-suffix: ci-${{ matrix.os }}-py${{ matrix.python-version }}
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Sync dependencies (Zero pip)
+        run: uv sync --locked
+
+      - name: Verify the selected Python interpreter
+        env:
+          EXPECTED_PYTHON: ${{ matrix.python-version }}
+        run: uv run --no-sync python -c "import os, sys; print(sys.version); assert '.'.join(map(str, sys.version_info[:2])) == os.environ['EXPECTED_PYTHON']"
+
+      - name: Run Ruff Linter
+        run: uv run ruff check src tests scripts
+
+      - name: Run Ty Typechecker
+        run: uv run ty check src tests scripts
+
+      - name: Run Pytest Suite
+        run: uv run pytest -v --basetemp "${{ runner.temp }}/nouc-tests"
+
+      - name: Verify End-to-End CLI Build & RLVR Gate
+        run: |
+          uv run nouc build --need "CI verification build with full lineage" --input examples/sample_bundle --output dist/ci_studio
+          uv run nouc verify dist/ci_studio/app.py --ty
+
+      - name: Build and validate Git-versioned distributions
+        if: matrix.os == 'ubuntu-24.04' && matrix.python-version == '3.12'
+        run: |
+          export SOURCE_DATE_EPOCH="$(git show -s --format=%ct HEAD)"
+          uv build --no-sources --out-dir dist/package
+          uv run --no-sync python scripts/release.py inspect dist/package
+          uv run --no-sync twine check --strict dist/package/*
+          uv run --no-sync python scripts/check_bootstrap_install.py dist/package
