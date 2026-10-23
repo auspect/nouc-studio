@@ -34,6 +34,8 @@ Before modifying or generating studio pipelines, load the relevant skill instruc
 - [`skills/adaptive-failure-memory/SKILL.md`](skills/adaptive-failure-memory/SKILL.md): Querying and recording failure-to-fix episodes in `.insights/memory/` (local) and `~/.nouc-studio/memory/` (global cross-project).
 - [`skills/epistemic-lineage-studio/SKILL.md`](skills/epistemic-lineage-studio/SKILL.md): `rustworkx.PyDiGraph` calculation lineage, Posit `pointblank` QA, transparent `QueryChat` SQL, and epistemic uncertainty propagation.
 - [`skills/studio-experience-design/SKILL.md`](skills/studio-experience-design/SKILL.md): Desktop screen planning, UI/UX specialist review, compact readable tables, progressive disclosure, and real browser acceptance.
+- [`skills/studio-view-authoring/SKILL.md`](skills/studio-view-authoring/SKILL.md): Task-oriented views and projection contracts, with concrete patterns from the official Studio examples.
+- [`skills/studio-launch-recovery/SKILL.md`](skills/studio-launch-recovery/SKILL.md): One launch command, build profiles, live Python execution, and recovery from failed or stale previews.
 
 ## 2. Desktop Experience Before and After Implementation
 
@@ -67,8 +69,12 @@ uv run nouc ground --module marimo_studio.authoring --symbol open_workspace
 # 4. Build & verify a multi-view Marimo Studio app
 uv run nouc build --need "<objective>" --input <path> --output dist/studio_app
 uv run nouc verify dist/studio_app/app.py --ty
+uv run nouc studio dist/studio_app/app.py --check
 
-# 5. Run full static, type, and test suite
+# 5. Open the app (or add --edit to work on Python and views)
+uv run nouc studio dist/studio_app/app.py
+
+# 6. Run full static, type, and test suite
 uv run ruff check src tests
 uv run ty check src tests
 uv run pytest -v

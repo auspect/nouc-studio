@@ -82,6 +82,9 @@ packages = ["src/nouc_studio"]
 "skills/adaptive-failure-memory/SKILL.md" = "nouc_studio/_bootstrap/skills/adaptive-failure-memory/SKILL.md"
 "skills/epistemic-lineage-studio/SKILL.md" = "nouc_studio/_bootstrap/skills/epistemic-lineage-studio/SKILL.md"
 "skills/studio-experience-design/SKILL.md" = "nouc_studio/_bootstrap/skills/studio-experience-design/SKILL.md"
+"skills/studio-view-authoring/SKILL.md" = "nouc_studio/_bootstrap/skills/studio-view-authoring/SKILL.md"
+"skills/studio-view-authoring/references/example-patterns.md" = "nouc_studio/_bootstrap/skills/studio-view-authoring/references/example-patterns.md"
+"skills/studio-launch-recovery/SKILL.md" = "nouc_studio/_bootstrap/skills/studio-launch-recovery/SKILL.md"
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -93,10 +96,15 @@ include = [
     "/skills/adaptive-failure-memory/SKILL.md",
     "/skills/epistemic-lineage-studio/SKILL.md",
     "/skills/studio-experience-design/SKILL.md",
+    "/skills/studio-view-authoring/SKILL.md",
+    "/skills/studio-view-authoring/references/example-patterns.md",
+    "/skills/studio-launch-recovery/SKILL.md",
     "/src/nouc_studio",
     "/tests",
     "/scripts",
     "/pyproject.toml",
+    "/pixi.toml",
+    "/pixi.lock",
     "/uv.lock",
     "/README.md",
     "/CONTRIBUTING.md",
@@ -104,6 +112,16 @@ include = [
     "/NOTICE",
     "/docs/publishing.md",
     "/docs/new-project.md",
+    "/docs/architecture.md",
+    "/docs/openui-review-2026-10.md",
+    "/docs/public-data.md",
+    "/docs/studio-launch.md",
+    "/docs/studio-launch-brief.md",
+    "/examples/README.md",
+    "/examples/BRIEF.md",
+    "/examples/offline_walkthrough.py",
+    "/examples/ui_contract.py",
+    "/examples/sample_bundle/quarterly_financials.csv",
     "/examples/demo_3_ai_infra_finops/frontier_llm_routing_2026.xlsx",
     "/examples/demo_2_clinical_biotech/phase2_patient_cohorts.xlsx",
     "/examples/sample_bundle/pricing_model.py",

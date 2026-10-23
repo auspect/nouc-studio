@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import subprocess
 import sys
 from pathlib import Path
@@ -162,9 +163,26 @@ def build_command(
         )
     console.print(view_table)
 
+    failures = []
+    if not report.verification_report.all_passed:
+        failures.append("notebook verification")
+    if any(not view.validation_passed for view in report.studio_bundle.views):
+        failures.append("Studio view validation")
+    if any(not qa.all_passed for qa in report.pointblank_reports):
+        failures.append("data QA")
+    if any(not audit.passed for audit in report.epistemic_audits):
+        failures.append("explanation audit")
+    if failures:
+        console.print(f"Build verification failed: {', '.join(failures)}.", markup=False)
+        console.print(
+            f"Inspect {output_dir / 'orchestration_report.json'} and run "
+            f'nouc verify "{report.studio_bundle.notebook_path}" --ty.', markup=False,
+        )
+        raise typer.Exit(code=1)
+
     console.print(
         Panel.fit(
-            f"[bold green]Deliverable Ready![/bold green]\n"
+            f"[bold green]Build checks passed; browser acceptance remains required.[/bold green]\n"
             f"- Notebook: [cyan]{report.studio_bundle.notebook_path}[/cyan]\n"
             f"- Lineage Graph ({report.lineage_node_count} nodes, {report.lineage_edge_count} edges): [cyan]{report.studio_bundle.lineage_json_path}[/cyan]\n"
             f"- Launch Studio Editor: [bold yellow]{report.studio_bundle.launch_edit_command}[/bold yellow]\n"
@@ -421,6 +439,48 @@ def demos_command(
         raise typer.Exit(code=1)
 
 
+@app.command("studio")
+def studio_command(
+    notebook: Annotated[
+        Path, typer.Argument(help="Studio notebook path (normally app.py).", envvar="NOUC_STUDIO_NOTEBOOK"),
+    ] = Path("app.py"),
+    edit: Annotated[bool, typer.Option("--edit", help="Open the editor and watch external Python edits.")] = False,
+    check: Annotated[
+        bool, typer.Option("--check", help="Build and validate by executing notebook Python; do not start a server."),
+    ] = False,
+    headless: Annotated[bool, typer.Option("--headless", help="Start the server without opening a browser.")] = False,
+    port: Annotated[int | None, typer.Option("--port", min=1, max=65535)] = None,
+    runtime_timeout: Annotated[
+        float, typer.Option("--runtime-timeout", min=1, help="Seconds per runtime validation (--check)."),
+    ] = 60.0,
+) -> None:
+    """Build the required Studio artifacts, then launch Marimo in the project environment."""
+    from nouc_studio.studio.launcher import (
+        StudioLaunchError,
+        prepare_studio,
+        studio_server_command,
+    )
+
+    notebook = notebook.resolve()
+    try:
+        asyncio.run(prepare_studio(
+            notebook, edit=edit, check_runtime=check, runtime_timeout=runtime_timeout,
+            emit=lambda message: console.print(message, markup=False, soft_wrap=True),
+        ))
+    except StudioLaunchError as exc:
+        console.print(f"Studio stopped: {exc}", markup=False, soft_wrap=True)
+        raise typer.Exit(code=1) from exc
+    if check:
+        console.print("Build and isolated Python checks passed. Live browser interaction is a separate check.")
+        return
+    if edit:
+        console.print("Editor: after a Python edit, run changed cells or Run all. Building a view does not run live Python.")
+    console.print("Starting Marimo; open the local URL printed below. Stop with Ctrl+C.")
+    command = studio_server_command(notebook, edit=edit, headless=headless, port=port)
+    result = subprocess.run(command, check=False)
+    raise typer.Exit(code=result.returncode)
+
+
 @app.command("workbench")
 def workbench_command(
     headless: Annotated[bool, typer.Option("--headless", help="Run workbench check without opening browser.")] = False,
@@ -430,7 +490,7 @@ def workbench_command(
     if headless:
         cmd = [sys.executable, "-m", "marimo", "check", str(wb_path)]
     else:
-        cmd = [sys.executable, "-m", "marimo", "edit", str(wb_path), "--watch", "--no-token"]
+        cmd = [sys.executable, "-m", "marimo", "edit", str(wb_path), "--no-sandbox", "--watch"]
     proc = subprocess.run(cmd, check=False)
     raise typer.Exit(code=proc.returncode)
 

@@ -1,6 +1,8 @@
 # Contributing to Nouc Studio
 
-Thank you for contributing to **Nouc Studio**! Please follow these engineering principles when submitting changes:
+Use the [public examples](examples/README.md) to reproduce the pipeline and the
+[architecture guide](docs/architecture.md) to understand its current boundaries.
+Review [public data and artifacts](docs/public-data.md) before staging changes.
 
 Versions come from Git commits and release tags, never from a manually edited
 package constant. See [Git versioning and tag-triggered publication](docs/publishing.md)
@@ -20,7 +22,10 @@ for development builds, the PyPI Trusted Publisher setup and release checks.
 
 ## 3. Graph-First Lineage & Epistemic Humility
 - All data sources, transformations, validations, and KPIs must be registered as typed nodes and edges in `LineageGraphEngine` (`rustworkx.PyDiGraph`).
-- Every output metric must propagate quantitative and epistemic uncertainty (`UncertaintyProfile`, 95% confidence interval, `TrustGrade` A–F, and explicit assumptions/caveats).
+- Every output metric must carry an `UncertaintyProfile`, a `TrustGrade` and
+  explicit assumptions/caveats. Label heuristic sensitivity ranges with their
+  method; reserve statistical confidence intervals for a justified statistical
+  model. Represent unsupported uncertainty as unknown rather than zero.
 
 ## 4. Dual-Tier Self-Healing Memory
 - Keep the entire `.insights/memory/` directory and the global store untracked.
@@ -38,7 +43,11 @@ for development builds, the PyPI Trusted Publisher setup and release checks.
 ## 5. Pre-Commit Verification Gate
 Before opening a Pull Request, ensure all checks pass with zero warnings/errors:
 ```bash
-uv run ruff check src tests
-uv run ty check src tests
+uv run ruff check src tests scripts examples/offline_walkthrough.py examples/ui_contract.py
+uv run ty check src tests scripts examples/offline_walkthrough.py examples/ui_contract.py
 uv run pytest -v
 ```
+
+Run changed examples using their documented commands. For UI changes, also
+exercise the real Studio at the target and a smaller desktop viewport, following
+[studio-experience-design](skills/studio-experience-design/SKILL.md).

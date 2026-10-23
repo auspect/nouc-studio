@@ -1,16 +1,20 @@
-[project]
+[workspace]
 name = "nouc-studio"
 description = "Nouc Studio: Self-evolving multi-agent system using Marimo & Monty sandboxes to build auditable, explainable, multi-view Marimo Studio applications."
 channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-arm64", "osx-64"]
 
 [tasks]
-sync = "uv sync"
-check-lint = "uv run ruff check src tests"
-check-types = "uv run ty check src"
-test = "uv run pytest -q"
+sync = "uv sync --locked"
+example-build = { cmd = "uv run --locked python examples/offline_walkthrough.py", description = "Create the synthetic example once; use --output for another directory." }
+app = { cmd = "uv run --locked nouc studio", env = { NOUC_STUDIO_NOTEBOOK = "dist/public-example/app.py" }, description = "Open the example, or pass a different app.py path." }
+edit = { cmd = "uv run --locked nouc studio --edit", env = { NOUC_STUDIO_NOTEBOOK = "dist/public-example/app.py" }, description = "Edit Studio with external Python file watching." }
+check-app = { cmd = "uv run --locked nouc studio --check", env = { NOUC_STUDIO_NOTEBOOK = "dist/public-example/app.py" }, description = "Build views and execute Python checks without a server." }
+check-lint = "uv run --locked ruff check src tests scripts examples/offline_walkthrough.py examples/ui_contract.py"
+check-types = "uv run --locked ty check src tests scripts examples/offline_walkthrough.py examples/ui_contract.py"
+test = "uv run --locked pytest -q"
 verify-all = { depends-on = ["check-lint", "check-types", "test"] }
-workbench = "uv run marimo edit src/nouc_studio/studio/workbench.py --sandbox --watch --no-token"
+workbench = "uv run --locked nouc workbench"
 
 [dependencies]
 python = ">=3.12,<3.14"

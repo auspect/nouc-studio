@@ -96,10 +96,11 @@ uv run python scripts/release.py inspect dist/package
 uv run twine check --strict dist/package/*
 ```
 
-The wheel contains the Python package, the eight canonical Copilot/skill
+The wheel contains the Python package, the eleven canonical Copilot/skill
 resources consumed by `nouc init`, the complete Apache-2.0 license and original
 copyright attribution in `NOTICE`. The sdist adds the canonical bootstrap sources,
-tests, release checker and four synthetic fixtures required by those tests.
+tests, release checker, selected documentation, public example scripts and
+explicitly listed synthetic fixtures.
 Resource allowlists and wheel/sdist byte comparisons prevent accidental omission
 or divergent instruction copies. The installed-wheel smoke test initializes a
 fresh temporary consumer project twice and verifies the `verify` extra and

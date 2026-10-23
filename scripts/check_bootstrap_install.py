@@ -83,7 +83,7 @@ def installed_check(
     before = snapshot(consumer)
     assert set(before) == {*COPILOT_FILES, MANIFEST_PATH}
     assets = load_copilot_resources()
-    assert len(assets) == 8
+    assert len(assets) == 11
     for name in COPILOT_FILES:
         assert before[name][0] == assets[name], f"Installed setup differs from its bundle: {name}"
     manifest = json.loads((consumer / MANIFEST_PATH).read_text(encoding="utf-8"))

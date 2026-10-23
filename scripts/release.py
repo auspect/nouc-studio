@@ -17,7 +17,12 @@ from pathlib import Path, PurePosixPath
 RELEASE_TAG = re.compile(
     r"v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:(?:a|b|rc)(?:0|[1-9]\d*))?"
 )
-SDIST_EXAMPLE_FIXTURES = {
+SDIST_EXAMPLE_FILES = {
+    "examples/README.md",
+    "examples/BRIEF.md",
+    "examples/offline_walkthrough.py",
+    "examples/ui_contract.py",
+    "examples/sample_bundle/quarterly_financials.csv",
     "examples/demo_3_ai_infra_finops/frontier_llm_routing_2026.xlsx",
     "examples/demo_2_clinical_biotech/phase2_patient_cohorts.xlsx",
     "examples/sample_bundle/pricing_model.py",
@@ -32,6 +37,9 @@ COPILOT_RESOURCE_FILES = (
     "skills/adaptive-failure-memory/SKILL.md",
     "skills/epistemic-lineage-studio/SKILL.md",
     "skills/studio-experience-design/SKILL.md",
+    "skills/studio-view-authoring/SKILL.md",
+    "skills/studio-view-authoring/references/example-patterns.md",
+    "skills/studio-launch-recovery/SKILL.md",
 )
 WHEEL_BOOTSTRAP_PREFIX = "nouc_studio/_bootstrap/"
 FORBIDDEN_ARCHIVE_PARTS = {
@@ -148,10 +156,10 @@ def inspect_distributions(directory: Path, tag: str = "", test_version: str = ""
             raise ValueError("The sdist contains local state, demos or secrets, or unexpected .github files.")
         if any(
             m.isfile() and Path(m.name).parts[1:2] == ("examples",)
-            and Path(*Path(m.name).parts[1:]).as_posix() not in SDIST_EXAMPLE_FIXTURES
+            and Path(*Path(m.name).parts[1:]).as_posix() not in SDIST_EXAMPLE_FILES
             for m in members
         ):
-            raise ValueError("The sdist contains examples other than the four test fixtures.")
+            raise ValueError("The sdist contains examples outside the reviewed public allowlist.")
         root = PurePosixPath(metadata_files[0].name).parts[0]
         for name in COPILOT_RESOURCE_FILES:
             matches = [member for member in members if member.name == f"{root}/{name}" and member.isfile()]

@@ -31,14 +31,22 @@ and exclusion summaries visible. Reuse intake answers; do not add cosmetic quest
 
 ## Live Pairing Workflow (`marimo-pair`)
 
-1. **Start or Attach to a Live Sandboxed Session**:
+1. **Start or Attach in the Project Environment**:
    ```bash
-   uvx --with "marimo-studio[deno]" marimo edit app_notebook.py --sandbox --watch --no-token
-   uvx --with marimo-studio marimo pair notebook list
+   uv run nouc studio app_notebook.py --edit
    ```
+   Follow [studio-launch-recovery](../studio-launch-recovery/SKILL.md).
+   Keep the browser editor connected so its kernel is available. For tools that
+   only discover local no-token servers, explicitly start a local development
+   session with `uv run marimo edit app_notebook.py --no-sandbox --watch --no-token`
+   after preparing development views. Do not disable authentication for remote
+   or shared servers. Then use `uv run marimo pair notebook list`.
+   A standalone PEP 723 notebook may instead use a deliberately configured
+   sandbox. Its declared packages must include Studio and any required provider
+   tools; do not add Deno to a plain Vanilla view by default.
 2. **Execute & Inspect Live State in Code Mode**:
    ```bash
-   uvx --with marimo-studio marimo pair execute --url <URL> --file <ABS_PATH> --code-file - <<'PY'
+   uv run marimo pair execute --url <URL> --file <ABS_PATH> --code-file - <<'PY'
    import marimo_studio
    workspace = marimo_studio.agent.current_workspace()
    print(await workspace.status())
@@ -58,10 +66,11 @@ and exclusion summaries visible. Reuse intake answers; do not add cosmetic quest
    Static HTML checks and `app.run()` do not replace this rendered-browser check.
    When browser access is unavailable, identify the gate as unverified.
 
-After editing a notebook or its views, regenerate the Studio artifacts, restart
-the serving runtime and open a fresh browser session before acceptance checks.
-Signed presentation capabilities are tied to the built artifacts and runtime;
-stale sessions can produce misleading fetch or update failures.
+After editing a view, build its development profile. After editing Python,
+execute pending cells in the live editor; isolated validation does not refresh
+that state. Get a fresh preview URL when its revision changed. Restart after
+environment changes or when a stale server session requires it; every edit does
+not require a restart. Use the production profile when handing off to run mode.
 For a custom HTML shell, ground
 `nouc_studio.studio.generator.render_studio_runtime_support` and include its
 returned script in the head to reuse the scoped virtual-file support.

@@ -89,8 +89,11 @@ uv run nouc init --agent copilot
 uv run nouc models
 ```
 
-`init` writes eight managed resources: `AGENTS.md`, the Copilot instructions and
-agent definition, and five `skills/*/SKILL.md` files. Its versioned manifest is
+`init` writes eleven managed resources: `AGENTS.md`, the Copilot instructions and
+agent definition, seven `skills/*/SKILL.md` files and the view-authoring example
+reference. The skills cover concrete official Studio patterns and
+`uv run nouc studio app.py` for launch and preview recovery; see the
+[launch guide](studio-launch.md). Its versioned manifest is
 `.nouc-studio/bootstrap.json`. Keep these files in your application's Git history.
 An identical rerun does not rewrite them. On an upgrade, unchanged managed files
 can be updated; user edits or unrelated existing files cause a conflict before

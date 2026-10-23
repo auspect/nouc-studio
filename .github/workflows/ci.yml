@@ -46,18 +46,28 @@ jobs:
         run: uv run --no-sync python -c "import os, sys; print(sys.version); assert '.'.join(map(str, sys.version_info[:2])) == os.environ['EXPECTED_PYTHON']"
 
       - name: Run Ruff Linter
-        run: uv run ruff check src tests scripts
+        run: uv run ruff check src tests scripts examples/offline_walkthrough.py examples/ui_contract.py
 
       - name: Run Ty Typechecker
-        run: uv run ty check src tests scripts
+        run: uv run ty check src tests scripts examples/offline_walkthrough.py examples/ui_contract.py
 
       - name: Run Pytest Suite
         run: uv run pytest -v --basetemp "${{ runner.temp }}/nouc-tests"
 
       - name: Verify End-to-End CLI Build & RLVR Gate
+        env:
+          INSIGHTS_DEFAULT_LLM_MODEL: offline
+          INSIGHTS_LOCAL_MEMORY_DIR: dist/ci-memory/local
+          INSIGHTS_GLOBAL_MEMORY_DIR: dist/ci-memory/global
         run: |
           uv run nouc build --need "CI verification build with full lineage" --input examples/sample_bundle --output dist/ci_studio
           uv run nouc verify dist/ci_studio/app.py --ty
+
+      - name: Verify public offline examples
+        run: |
+          uv run python examples/offline_walkthrough.py
+          uv run python examples/ui_contract.py --traces dist/public-example/lineage_traces.json
+          uv run nouc studio dist/public-example/app.py --check
 
       - name: Build and validate Git-versioned distributions
         if: matrix.os == 'ubuntu-24.04' && matrix.python-version == '3.12'

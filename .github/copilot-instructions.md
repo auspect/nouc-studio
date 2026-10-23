@@ -117,7 +117,8 @@ the routine tester. Mobile checks are optional unless requested.
      ```bash
      uv run nouc ground --module <module_name> --symbol <SymbolName>
      ```
-   - Read the relevant specialized skills under `skills/*/SKILL.md` (`marimo-pair-sandbox`, `deepwiki-live-grounding`, `adaptive-failure-memory`, `epistemic-lineage-studio`, `studio-experience-design`).
+   - Read the relevant specialized skills under `skills/*/SKILL.md` (`marimo-pair-sandbox`, `deepwiki-live-grounding`, `adaptive-failure-memory`, `epistemic-lineage-studio`, `studio-experience-design`, `studio-view-authoring`, `studio-launch-recovery`).
+   - Use `studio-view-authoring` when adapting official examples or wiring projections. Use `studio-launch-recovery` to run `uv run nouc studio <app.py>` and diagnose build, Python or browser failures. A view build does not execute pending Python cells in the live editor.
 
 3. **Consult & Update Dual-Tier Adaptive Memory**:
    - Before generating or debugging code, inspect active prevention rules:

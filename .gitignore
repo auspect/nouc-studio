@@ -26,6 +26,9 @@ __marimo__/
 # Share reviewed, anonymized prevention rules in documentation instead.
 .insights/memory/
 
+# Private business inputs and local review material
+private/
+
 # Environment secrets
 .env
 .env.*

@@ -1347,8 +1347,8 @@ class StudioApplicationGenerator:
             lineage_json_path=str(lineage_json_path),
             traces_json_path=str(traces_json_path),
             views=views,
-            launch_edit_command=f'uv run marimo edit "{notebook_path}" --watch --no-token',
-            launch_run_command=f'uv run marimo run "{notebook_path}"',
+            launch_edit_command=f'uv run nouc studio "{notebook_path}" --edit',
+            launch_run_command=f'uv run nouc studio "{notebook_path}"',
         )
 
     async def _author_and_build_views_async(

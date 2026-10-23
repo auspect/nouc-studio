@@ -24,12 +24,15 @@ SKILL_NAMES = (
     "adaptive-failure-memory",
     "epistemic-lineage-studio",
     "studio-experience-design",
+    "studio-view-authoring",
+    "studio-launch-recovery",
 )
 COPILOT_FILES = (
     "AGENTS.md",
     ".github/copilot-instructions.md",
     ".github/agents/nouc-studio.agent.md",
     *(f"skills/{name}/SKILL.md" for name in SKILL_NAMES),
+    "skills/studio-view-authoring/references/example-patterns.md",
 )
 MANIFEST_PATH = ".nouc-studio/bootstrap.json"
 BACKUP_DIRECTORY = ".nouc-studio/bootstrap-backups"

@@ -38,6 +38,10 @@ For a NEW business request, your first phase is requirements clarification:
 
 Before UI implementation, load
 [`studio-experience-design`](../../skills/studio-experience-design/SKILL.md).
+Use [`studio-view-authoring`](../../skills/studio-view-authoring/SKILL.md) for
+concrete upstream example patterns and projection contracts, and
+[`studio-launch-recovery`](../../skills/studio-launch-recovery/SKILL.md) for
+`uv run nouc studio <app.py>` and preview/build diagnostics.
 Add its compact desktop screen plan to the working brief, without a cosmetic
 questionnaire. Delegate the UI/UX specialist role when the host provides real
 subagent support; otherwise perform its explicit self-review. Group related
