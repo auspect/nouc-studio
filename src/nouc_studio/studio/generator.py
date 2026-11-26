@@ -495,7 +495,7 @@ def _generate_notebook_source(
 #     "marimo>=0.20.0",
 #     "marimo-studio>=0.3.0",
 #     "polars>=1.20.0",
-#     "duckdb>=1.2.0",
+#     "duckdb>=1.2.0,<2",
 #     "pointblank>=0.10.0",
 #     "pyarrow>=26.0.0",
 # ]
