@@ -150,3 +150,12 @@ ignore = ["E501", "B018"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 pythonpath = ["src"]
+
+[tool.uv]
+# Keep the lock installable on the platforms CI and pixi.toml target.
+required-environments = [
+    "sys_platform == 'win32' and platform_machine == 'AMD64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'darwin' and platform_machine == 'x86_64'",
+]
